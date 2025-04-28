@@ -1,0 +1,90 @@
+version: "2"
+
+run:
+  timeout: 5m
+  concurrency: 8
+  skip-dirs:
+    - bin
+    - vendor
+    - var
+    - tmp
+    - .cache
+  skip-files:
+    - ".*\\.pb\\.go$"
+  new-from-rev: HEAD~1
+  modules-download-mode: readonly
+  issues-exit-code: 1
+
+linters:
+  enable:
+    - errcheck
+    - govet
+    - ineffassign
+    - staticcheck
+    - bodyclose
+    - errorlint
+    - gocritic
+    - misspell
+    - revive
+    - testifylint
+    - usestdlibvars
+    - wsl
+
+linters-settings:
+  errcheck:
+    exclude-functions:
+      - (*os.File).Close
+  gocritic:
+    enabled-checks:
+      - appendAssign
+      - argOrder
+      - badCond
+      - captLocal
+      - caseOrder
+      - commentFormatting
+      - dupArg
+      - dupBranchBody
+      - dupCase
+      - elseif
+      - flagDeref
+      - ifElseChain
+      - sloppyLen
+      - sloppyTypeAssert
+      - switchTrue
+      - underef
+  misspell:
+    locale: US
+  revive:
+    rules:
+      - name: blank-imports
+        severity: error
+      - name: context-as-argument
+        severity: error
+      - name: dot-imports
+        severity: error
+      - name: error-return
+        severity: error
+      - name: error-strings
+        severity: error
+      - name: error-naming
+        severity: error
+      - name: exported
+        severity: error
+  staticcheck:
+    checks:
+      - all
+  testifylint:
+    enable-all: true
+    disable:
+      - negative-positive
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  exclude-rules:
+    - linters:
+        - revive
+      text: "exported: exported function.*should have comment"
+    - linters:
+        - gocritic
+      text: "commentFormatting: comment should start with.*"
