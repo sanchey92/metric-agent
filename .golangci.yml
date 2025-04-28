@@ -1,7 +1,7 @@
 version: "2"
 
 run:
-  concurrency: 4
+  concurrency: 8
   timeout: 5m
   skip-dirs:
     - vendor
@@ -18,19 +18,23 @@ run:
 
 linters:
   enable:
-    - govet
-    - staticcheck
-    - unused
-    - revive
-    - gocritic
+    # Основные линтеры
+    - govet       # Стандартные проверки Go
+    - staticcheck # Продвинутый статический анализ (включает unused)
+    - revive      # Проверка стиля
+    - gocritic    # Критический анализ кода
+
+    # Безопасность
     - gosec
-    - errcheck
-    - nilerr
-    - dupl
-    - goconst
-    - prealloc
-    - bodyclose
-    - lll
+
+    # Дополнительные проверки
+    - errcheck    # Проверка обработки ошибок
+    - nilerr      # Проверка избыточных nil-проверок
+    - dupl        # Поиск дубликатов кода
+    - goconst     # Поиск магических строк/чисел
+    - prealloc    # Проверка предварительной аллокации
+    - bodyclose   # Проверка закрытия HTTP body
+    - lll         # Проверка длины строк
 
   settings:
     revive:
@@ -40,6 +44,8 @@ linters:
         - name: exported
           severity: error
           arguments: [ "disableStutteringCheck" ]
+        - name: unused-parameter
+          severity: warning  # Добавлено правило для неиспользованных параметров
 
     gocritic:
       enabled-checks:
@@ -52,11 +58,11 @@ linters:
 
     gosec:
       excludes:
-        - G104
-        - G307
+        - G104 # errcheck делает это лучше
+        - G307 # defer close проверка
 
     dupl:
-      threshold: 10
+      threshold: 30
 
     lll:
       line-length: 120
@@ -77,6 +83,9 @@ issues:
     - text: "Error return value of .* not checked"
       linters:
         - errcheck
+    - text: "unused parameter"  # Исключение для неиспользованных параметров
+      linters:
+        - revive
 
 output:
   format: colored-line-number

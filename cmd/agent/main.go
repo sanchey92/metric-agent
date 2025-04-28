@@ -1,8 +1,14 @@
 // Package main is the entry point of the application.
 package main
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/sanchey92/metric-agent/internal/config"
+)
 
 func main() {
-	fmt.Println("Init project")
+	cfg := config.New()
+
+	fmt.Println(cfg)
 }
