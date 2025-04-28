@@ -1,90 +1,84 @@
 version: "2"
 
 run:
+  concurrency: 4
   timeout: 5m
-  concurrency: 8
   skip-dirs:
-    - bin
     - vendor
-    - var
-    - tmp
-    - .cache
+    - .git
+    - "api/docs"
+    - internal/mocks
+    - testdata
+    - bin
   skip-files:
-    - ".*\\.pb\\.go$"
-  new-from-rev: HEAD~1
-  modules-download-mode: readonly
-  issues-exit-code: 1
+    - "*_test.go"
+    - "*.pb.go"
+    - "*.gw.go"
+    - "*.easyjson.go"
 
 linters:
   enable:
-    - errcheck
     - govet
-    - ineffassign
     - staticcheck
-    - bodyclose
-    - errorlint
-    - gocritic
-    - misspell
+    - unused
     - revive
-    - testifylint
-    - usestdlibvars
-    - wsl
+    - gocritic
+    - gosec
+    - errcheck
+    - nilerr
+    - dupl
+    - goconst
+    - prealloc
+    - bodyclose
+    - lll
 
-linters-settings:
-  errcheck:
-    exclude-functions:
-      - (*os.File).Close
-  gocritic:
-    enabled-checks:
-      - appendAssign
-      - argOrder
-      - badCond
-      - captLocal
-      - caseOrder
-      - commentFormatting
-      - dupArg
-      - dupBranchBody
-      - dupCase
-      - elseif
-      - flagDeref
-      - ifElseChain
-      - sloppyLen
-      - sloppyTypeAssert
-      - switchTrue
-      - underef
-  misspell:
-    locale: US
-  revive:
-    rules:
-      - name: blank-imports
-        severity: error
-      - name: context-as-argument
-        severity: error
-      - name: dot-imports
-        severity: error
-      - name: error-return
-        severity: error
-      - name: error-strings
-        severity: error
-      - name: error-naming
-        severity: error
-      - name: exported
-        severity: error
-  staticcheck:
-    checks:
-      - all
-  testifylint:
-    enable-all: true
-    disable:
-      - negative-positive
+  settings:
+    revive:
+      rules:
+        - name: package-comments
+          severity: warning
+        - name: exported
+          severity: error
+          arguments: [ "disableStutteringCheck" ]
+
+    gocritic:
+      enabled-checks:
+        - hugeParam
+        - rangeExprCopy
+        - sloppyReassign
+      settings:
+        rangeExprCopy:
+          sizeThreshold: 128
+
+    gosec:
+      excludes:
+        - G104
+        - G307
+
+    dupl:
+      threshold: 10
+
+    lll:
+      line-length: 120
+      tab-width: 1
+      ignore-generated: true
 
 issues:
   max-issues-per-linter: 0
   max-same-issues: 0
   exclude-rules:
-    - linters:
-        - revive
-      text: "exported: exported function.*should have comment"
-    - linters:
+    - path: "_test.go"
+      linters:
+        - dupl
         - gocritic
-      text: "commentFormatting: comment should start with.*"
+    - path: "*.pb.go"
+      linters:
+        - revive
+    - text: "Error return value of .* not checked"
+      linters:
+        - errcheck
+
+output:
+  format: colored-line-number
+  print-issued-lines: true
+  print-linter-name: true
