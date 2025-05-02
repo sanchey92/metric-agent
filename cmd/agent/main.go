@@ -2,13 +2,20 @@
 package main
 
 import (
-	"fmt"
+	"context"
+	"log"
 
+	"github.com/sanchey92/metric-agent/internal/app"
 	"github.com/sanchey92/metric-agent/internal/config"
 )
 
 func main() {
 	cfg := config.New()
+	ctx := context.Background()
 
-	fmt.Println(cfg)
+	a := app.New(cfg)
+
+	if err := a.Run(ctx); err != nil {
+		log.Fatal("error")
+	}
 }

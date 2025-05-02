@@ -13,7 +13,7 @@ import (
 // It contains all configurable parameters needed across the application.
 type Config struct {
 	ServerAddr     string
-	PoolInterval   time.Duration
+	PollInterval   time.Duration
 	ReportInterval time.Duration
 }
 
@@ -21,13 +21,13 @@ type Config struct {
 // It reads environment variables with fallback to default values.
 // Returns a pointer to the initialized Config.
 func New() *Config {
-	addr := getEnv("SERVER_ADDRESS", "http://localhost:8080")
+	addr := getEnv("SERVER_ADDRESS", "http://localhost:8080/update")
 	pollSec := getEnvAsInt("POLL_INTERVAL", 2)
 	reportSec := getEnvAsInt("REPORT_INTERVAL", 10)
 
 	return &Config{
 		ServerAddr:     addr,
-		PoolInterval:   time.Duration(pollSec) * time.Second,
+		PollInterval:   time.Duration(pollSec) * time.Second,
 		ReportInterval: time.Duration(reportSec) * time.Second,
 	}
 }
